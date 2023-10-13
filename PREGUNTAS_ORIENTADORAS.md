@@ -95,15 +95,125 @@ NMI significa Non-Maskable Interrupt (Interrupción no enmascarable). Las interr
 Cuando ocurre una falla de hardware, el procesador Cortex-M genera una excepción de falla de hardware. La excepción de falla de hardware es la excepción de mayor prioridad en los microcontroladores Cortex-M y no se puede deshabilitar.
 
 ### 10. Describa las funciones principales del stack. ¿Cómo resuelve la arquitectura el llamado a funciones y su retorno?
+
+El stack es una estructura de datos fundamental en la programación y en la arquitectura de microcontroladores. Se utiliza para almacenar datos y registros importantes durante la ejecución del programa, especialmente cuando se trata del llamado a funciones y su retorno.
+
+Funciones principales del stack
+
+- Almacenamiento temporal: el stack se utiliza para almacenar de manera temporal datos y registros importantes durante la ejecución del programa. Esto incluye la preservación de registros antes de realizar llamadas a funciones para que se puedan restaurar después de que la función retorne.
+- Gestión de llamadas a funciones: Cuando se llama a una función, la dirección de retorno y otros valores necesarios se almacenan en el stack. Esto permite a la función su ejecución y que luego pueda regresar al punto de llamada cuando termine.
+- Anidamiento de llamadas: Cuando una función llama a otra función, la dirección de retorno y los registros de la función actual se almacenan en el stack. Esto permite que se realice otra llamada antes de que la función actual haya terminado.
+- Almacenamiento de variables locales: Podemos guardar las variables locales de una función en el stack. Esto asegura que las variables locales estén disponibles solo dentro del contexto de la función y se liberen automáticamente cuando la función regresa.
+
 ### 11. Describa la secuencia de reset del microprocesador.
+
+
+La secuencia de reset de los procesadores Cortex-M es la siguiente:
+
+- El controlador de reset inicializa el procesador.
+- El procesador lee las dos primeras palabras de la memoria (la tabla de vectores).
+- El procesador configura el MSP y el Contador de Programa (PC) con los valores de las dos primeras palabras de la tabla de vectores.
+- El procesador ejecuta el programa a partir de la dirección especificada en el vector de reset.
+
+![alt](/images/reset-seq.png)
+
 ### 12. ¿Qué entiende por “core peripherals”? ¿Qué diferencia existe entre estos y el resto de los periféricos?
+
+Los "core peripherals" son los periféricos integrados en el núcleo del procesador Cortex-M. Estos periféricos son esenciales para el funcionamiento del procesador y no requieren hardware adicional para funcionar. Algunos ejemplos de core peripherals son:
+
+- MSP: El MSP es un puntero al stack principal del procesador. El stack se utiliza para almacenar datos temporales, como registros y direcciones de retorno.
+- Contador de programa (PC): El PC es un registro que contiene la dirección de la instrucción que se está ejecutando actualmente.
+- Controlador de interrupciones (NVIC): El NVIC es un controlador que gestiona las interrupciones del procesador.
+- Controlador de memoria (MMU): La MMU es un controlador que gestiona la memoria del procesador.
+
+Los demás periféricos son periféricos externos que no están integrados en el núcleo del procesador. Estos periféricos requieren hardware adicional para funcionar, como memoria, puertos GPIO o controladores de comunicaciones.
+
 ### 13. ¿Cómo se implementan las prioridades de las interrupciones? Dé un ejemplo
+
+Las prioridades de las interrupciones se implementan mediante registros de prioridad, con un ancho de 3 a 8 bits.
+
+Cuantos más bits se implementen, más niveles de prioridad estarán disponibles. Sin embargo, más bits de prioridad también pueden aumentar el número de puertas y, por lo tanto, el consumo de energía de los diseños de silicio. Para la arquitectura ARMv7-M, el número mínimo de anchos de registro de prioridad implementados es 3 bits (ocho niveles). En los procesadores Cortex-M3 y Cortex-M4, todos los registros de nivel de prioridad tienen un valor de reinicio de 0.
+
 ### 14. ¿Qué es el CMSIS? ¿Qué función cumple? ¿Quién lo provee? ¿Qué ventajas aporta?
+
+
+CMSIS es un estándar de software desarrollado por ARM que proporciona una API común para acceder a los periféricos y funciones de los microcontroladores Cortex-M.
+
+CMSIS facilita el desarrollo de software para microcontroladores Cortex-M, proporcionando una API común para todos los dispositivos.
+
+CMSIS es proporcionado por ARM, pero está disponible de forma gratuita para todos los desarrolladores.
+
+Ventajas:
+
+Portabilidad: permite a los desarrolladores escribir código que se pueda ejecutar en diferentes dispositivos.
+Eficiencia: proporciona código optimizado para acceder a los periféricos y funciones del procesador.
+Facilidad de uso: proporciona una API sencilla y fácil de usar.
+
 ### 15. Cuando ocurre una interrupción, asumiendo que está habilitada ¿Cómo opera el microprocesador para atender a la subrutina correspondiente? Explique con un ejemplo
+
+Cuando un periférico o hardware necesita servicio del procesador, normalmente se produce la siguiente secuencia:
+
+- El periférico genera una solicitud de interrupción al procesador.
+- El procesador suspende la tarea que se está ejecutando actualmente.
+- El procesador ejecuta una rutina de servicio de interrupción (ISR) para atender al periférico y, opcionalmente, borrar la solicitud de interrupción por software si es necesario.
+- El procesador reanuda la tarea previamente suspendida.
+
+```assembly
+// Define la dirección de la ISR
+.global _timer_irq_handler
+
+// ISR de interrupción de timer
+_timer_irq_handler:
+
+  // Salva el estado del procesador
+  push {r0-r3,lr}
+
+  beq _handle_timer_irq
+
+  // vuelve a la tarea que se estaba ejecutando
+  bx lr
+  ```
+
+
 ### 16. ¿Cómo cambia la operación de stacking al utilizar la unidad de punto flotante?
+
+
+La operación de stacking cambia al utilizar la unidad de punto flotante de la siguiente manera:
+
+- Los registros de punto flotante se apilan en el stack de la misma manera que los registros de propósito general.
+- Los registros de punto flotante se apilan en orden inverso, comenzando por el registro de punto flotante menos significativo.
+- El valor de retorno de una función de punto flotante se almacena en el registro de punto flotante más significativo.
+
+![alt](/images/stack%20floating%20point.png)
+
 ### 17.  Explique las características avanzadas de atención a interrupciones: tail chaining y late arrival.
+
+#### tail chaining
+Es una técnica que se utiliza para reducir el tiempo que tarda el procesador en manejar una excepción cuando ya está manejando otra excepción de la misma o mayor prioridad. La latencia de la cadena de cola funciona omitiendo los pasos de unstacking y stacking de registros, lo que permite al procesador entrar en el handler de excepciones de la excepción pendiente lo antes posible.
+
+#### late arrival
+
+Cuando se produce una excepción, el procesador acepta la solicitud de excepción e inicia la operación de stacking. Si durante esta operación de stacking se produce otra excepción de mayor prioridad, la excepción de llegada tardía de mayor prioridad se atenderá primero.
+
+
 ### 18.  ¿Qué es el systick? ¿Por qué puede afirmarse que su implementación favorece la portabilidad de los sistemas operativos embebidos?
+
+El SysTick es un temporizador integrado en los procesadores Cortex-M. Está integrado como parte del NVIC y puede generar la excepción SysTick (excepción #15). El temporizador SysTick es un simple temporizador de decremento de 24 bits y puede funcionar con la frecuencia del reloj del procesador o con la frecuencia del reloj de referencia.
+
+La implementación del SysTick favorece la portabilidad de los sistemas operativos embebidos porque todos los procesadores Cortex-M tienen el mismo temporizador SysTick. Esto significa que un sistema operativo escrito para un microcontrolador Cortex-M3/M4 puede reutilizarse en otros microcontroladores Cortex-M3/M4.
+
+
 ### 19.  ¿Qué funciones cumple la unidad de protección de memoria (MPU)?
+
+La MPU es un dispositivo programable que puede utilizarse para definir permisos de acceso a la memoria (por ejemplo, solo acceso privilegiado o acceso completo) y atributos de la memoria (por ejemplo, almacenable en búfer, almacenable en caché) para diferentes regiones de memoria. La MPU de los procesadores Cortex-M3 y Cortex-M4 puede soportar hasta ocho regiones de memoria programables, cada una con sus propias direcciones de inicio, tamaños y ajustes programables. También admite una función de región de fondo.
+
+La MPU puede utilizarse para hacer que un sistema embebido sea más robusto y, en algunos casos, puede hacer que el sistema sea más seguro al:
+
+- Evitar que las tareas de la aplicación corrompan el stack o la memoria de datos utilizada por otras tareas y el núcleo del sistema operativo.
+- Evitar que las tareas sin privilegios accedan a determinados periféricos que pueden ser críticos para la fiabilidad o la seguridad del sistema.
+- Definir el espacio SRAM o RAM como no ejecutable (eXecute Never, XN) para evitar ataques de inyección de código.
+- También puede utilizar la MPU para definir otros atributos de la memoria, como la capacidad de almacenamiento en caché, que pueden exportarse a la unidad de caché del sistema o a los controladores de memoria.
+
 ### 20.  ¿Cuántas regiones pueden configurarse como máximo? ¿Qué ocurre en caso de haber solapamientos de las regiones? ¿Qué ocurre con las zonas de memoria no cubiertas por las regiones definidas?
 ### 21.  ¿Para qué se suele utilizar la excepción PendSV? ¿Cómo se relaciona su uso con el resto de las excepciones? Dé un ejemplo
 ### 22.  ¿Para qué se suele utilizar la excepción SVC? Expliquelo dentro de un marco de un sistema operativo embebido.
