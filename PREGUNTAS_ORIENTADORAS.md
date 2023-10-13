@@ -1,36 +1,19 @@
 ## Respuestas a las preguntas del trabajo práctico
 
-### 1. Diferencias entre las familias Cortex M0, M3 y M4
+### 1. Describa brevemente las diferencias entre las familias de procesadores Cortex M0, M3 y M4.
 
-| Característica | Cortex M0 | Cortex M3 | Cortex M4 |
-|---|---|---|---|
-| Conjunto de instrucciones | Reducido | Completo | Completo + punto flotante |
-| Número de registros | 16 | 32 | 32 |
-| Modos de operación | Un solo modo | Un solo modo | Un solo modo |
-| Prioridades de interrupción | 4 | 8 | 8 |
-| Unidad de punto flotante | No | No | Sí |
-| Consumo de energía | Bajo | Bajo | Medio |
-| Rendimiento | Bajo | Medio | Alto |
+Cortex M0: Es el procesador más básico de la familia Cortex M, diseñado para aplicaciones de bajo costo y bajo consumo de energía. Tiene una arquitectura de 32 bits, pero solo puede ejecutar código Thumb-2, que es un conjunto de instrucciones codificadas en 16 bits.
+Cortex M3: Es un procesador más potente que el Cortex M0, con una arquitectura de 32 bits y la capacidad de ejecutar código Thumb-2 y Thumb. También tiene una unidad de división de hardware y un conjunto de instrucciones de aritmética de saturación.
+Cortex M4: Es el procesador más potente de la familia Cortex M, con una arquitectura de 32 bits y la capacidad de ejecutar código Thumb-2, Thumb y Thumb-EE. También tiene una unidad de división de hardware, un conjunto de instrucciones de aritmética de saturación y una unidad de punto flotante opcional.
+En resumen, el Cortex M0 es el procesador más básico y de menor costo, el Cortex M3 es un procesador intermedio más potente, y el Cortex M4 es el procesador más potente y versátil.
 
-### 2. Densidad de código del set de instrucciones Thumb
+### 2. ¿Por qué se dice que el set de instrucciones Thumb permite mayor densidad de código? Explique
 
-El set de instrucciones Thumb permite mayor densidad de código que el set de instrucciones ARM. Esto se debe a que las instrucciones Thumb son de longitud de 16 bits, mientras que las instrucciones ARM son de longitud de 32 bits.
+El set de instrucciones Thumb permite mayor densidad de código porque utiliza un formato de instrucción de 16 bits, en comparación con el formato de instrucción de 32 bits utilizado por el set de instrucciones ARM. Esto significa que cada instrucción Thumb ocupa la mitad de espacio que una instrucción ARM, lo que permite almacenar más código en la misma cantidad de memoria.
 
-**Explicación:**
+### 3. ¿Qué entiende por arquitectura load-store? ¿Qué tipo de instrucciones no posee este tipo de arquitectura?
 
-Las instrucciones ARM se componen de dos palabras de 16 bits, una para el código de operación y otra para los operandos. Las instrucciones Thumb, por otro lado, se componen de una sola palabra de 16 bits que contiene tanto el código de operación como los operandos.
-
-Esto significa que las instrucciones Thumb requieren la mitad de la memoria que las instrucciones ARM. Como resultado, los programas escritos en Thumb suelen ser más pequeños y eficientes que los programas escritos en ARM.
-
-### 3. Arquitectura load-store
-
-Una arquitectura load-store es un modelo de arquitectura de memoria en el que las operaciones de carga y almacenamiento son las únicas que pueden acceder a la memoria principal.
-
-**Tipos de instrucciones que no posee este tipo de arquitectura:**
-
-* Instrucciones de aritmética e indirección
-* Instrucciones de control de flujo
-* Instrucciones de coma flotante
+Esto significa que los datos deben cargarse desde la memoria, procesarse y luego volver a escribirse en la memoria utilizando una serie de instrucciones independientes. Por ejemplo, para incrementar un valor de datos almacenado en la SRAM, el procesador necesita usar una instrucción para leer los datos de la SRAM y colocarlos en un registro dentro del procesador, una segunda instrucción para incrementar el valor del registro y luego una tercera instrucción para escribir el valor de nuevo en la memoria. Los detalles de los registros dentro de los procesadores se conocen comúnmente como el modelo de programador.
 
 ### 4. Mapa de memoria de la familia Cortex M
 
