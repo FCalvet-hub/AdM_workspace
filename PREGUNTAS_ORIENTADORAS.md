@@ -247,8 +247,82 @@ La excepción SVC (Supervisor Call) se utiliza en sistemas operativos embebidos 
 
 ## ISA
 ### 1. ¿Qué son los sufijos y para qué se los utiliza? Dé un ejemplo
+
+En assembler para procesadores ARM, algunas instrucciones pueden ir seguidas de sufijos.
+
+Una instrucción de procesamiento de datos puede actualizar opcionalmente el APSR (flags). Si se utiliza la sintaxis del "Unified Assembly Language" (UAL), se puede especificar si la actualización del APSR debe realizarse o no. Por ejemplo, al mover datos de un registro a otro, es posible utilizar:
+
+```
+MOVS R0, R1 ; Mover R1 a R0 y actualizar APSR
+```
+
+O:
+```
+MOV R0, R1 ; Mover R1 a R0, y no actualizar APSR
+```
+
+El segundo tipo de sufijo es para la ejecución condicional de instrucciones. Los procesadores Cortex-M3 y Cortex-M4 admiten ramas condicionales, así como la ejecución condicional de instrucciones colocando las instrucciones condicionales en un bloque de instrucciones IF-THEN (IT). Al actualizar el APSR mediante operaciones de datos, o instrucciones como test (TST) o compare (CMP), se puede controlar la ejecución de las instrucciones condicionales.
+
 ### 2. ¿Para qué se utiliza el sufijo ‘s’? Dé un ejemplo
+
+Ver explicación en la respuesta anterior.
+Ejemplo:
+
+```
+.thumb_func
+	asm_func:
+
+	loop:
+		subs r1, #1   ; resta uno a R1 y actualizar APSR
+
+		bne loop      ; Con el APSR actualizado, compara
+
+	exit:
+		bx lr	 ; vuelve adonde fue llamada
+```
+
 ### 3. ¿Qué utilidad tiene la implementación de instrucciones de aritmética saturada? Dé un ejemplo con operaciones con datos de 8 bits.
+
+La utilidad de la implementación de instrucciones de aritmética saturada en la arquitectura ARM radica en su capacidad para evitar desbordamientos y subdesbordamientos. Esto es importante en aplicaciones en la que se deba usar procesamiento digital de señales por ejemplo.
+
+```
+MOV R0, #300     ; Cargamos el valor 300 en R0
+USAT R1, #0, R0, #8   ; Saturamos R0 a un rango de 0 a 255 y almacenamos el resultado en R1
+```
+
 ### 4. Describa brevemente la interfaz entre assembler y C ¿Cómo se reciben los argumentos de las funciones? ¿Cómo se devuelve el resultado? ¿Qué registros deben guardarse en el stack antes de ser modificados?
+
+
+La interfaz entre C y Assembly en Cortex está definida en el documento “ARM Architecture Procedure Call Standar”. Conocido también como AAPCS. Este documento define las reglas que deben seguirse para que el código escrito en C y Assembly pueda comunicarse entre sí.
+
+Los más destacado de este documento son:
+
+Registros para pasar parámetros: r0, r1, r2 y r3 son los registros que se utilizan para pasar como parámetros a una función. Estos registros se utilizan para pasar los argumentos de la función en orden, empezando por el primer argumento en r0. Por ejemplo, la siguiente función recibe tres argumentos:
+
+```C
+int myFunc(int arg0, int arg1, int arg2) {
+  // ...
+}
+```
+
+Registro para devolver resultados: r0 se utiliza para devolver el resultado de una función. El valor devuelto por la función se almacena en el registro r0.
+
+Además de estos dos puntos, el AAPCS también define las siguientes reglas:
+
+- Registros para uso local: r4, r5, r6 y r7 se utilizan para uso local en la función. Estos registros pueden utilizarse para almacenar variables temporales o para realizar cálculos.
+- Registros para uso especial: r8 se utiliza para almacenar el puntero a la pila, r9 se utiliza para almacenar el puntero a la dirección de retorno y r10 se utiliza para almacenar el puntero a la pila de marcos.
+- Registros para uso por el procesador: r11, r12, r13, r14 y r15 se utilizan por el procesador para fines internos.
+
 ### 5. ¿Qué es una instrucción SIMD? ¿En qué se aplican y que ventajas reporta su uso? Dé un ejemplo.
+
+
+SIMD son las siglas de Single Instruction, Multiple Data. Es una técnica de paralelismo que permite realizar la misma operación sobre varios datos a la vez.
+
+Las instrucciones SIMD se aplican en aplicaciones donde se requiere realizar operaciones matemáticas o lógicas sobre grandes cantidades de datos. Por ejemplo, se utilizan en aplicaciones de procesamiento de imágenes, video, audio, compresión de datos, criptografía, etc.
+
+Las ventajas de utilizar instrucciones SIMD son las siguientes:
+
+- Rendimiento: Las instrucciones SIMD pueden realizar operaciones en paralelo, lo que puede mejorar significativamente el rendimiento de las aplicaciones.
+- Eficiencia: Las instrucciones SIMD pueden utilizar menos recursos del procesador, lo que puede mejorar la eficiencia energética.
+- Facilidad de uso: Las instrucciones SIMD suelen ser fáciles de utilizar, ya que se pueden utilizar como instrucciones normales.
 
