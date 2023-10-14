@@ -215,8 +215,35 @@ La MPU puede utilizarse para hacer que un sistema embebido sea más robusto y, e
 - También puede utilizar la MPU para definir otros atributos de la memoria, como la capacidad de almacenamiento en caché, que pueden exportarse a la unidad de caché del sistema o a los controladores de memoria.
 
 ### 20.  ¿Cuántas regiones pueden configurarse como máximo? ¿Qué ocurre en caso de haber solapamientos de las regiones? ¿Qué ocurre con las zonas de memoria no cubiertas por las regiones definidas?
+
+El número de regiones de memoria que se pueden configurar en la MPU de un Cortex-M depende del microcontrolador específico. El fabricante define el número máximo de regiones que se pueden configurar.
+
+Cuando se configuran regiones que se solapan, es importante comprender cómo se comporta la MPU y cómo se resuelven estos solapamientos. Aquí se describen las consideraciones clave:
+
+- Prioridad de región: La MPU suele dar prioridad a las regiones con permisos más restrictivos en caso de solapamiento. Esto significa que, si dos regiones se solapan y una de ellas tiene permisos más restrictivos que la otra, los permisos más restrictivos prevalecerán.
+- Permisos de acceso: Los permisos de acceso también son importantes en la resolución de solapamientos. Si dos regiones se solapan pero tienen permisos de acceso diferentes, la MPU aplicará los permisos específicos de cada región a las direcciones correspondientes.
+- Región más específica: En algunos casos, si una dirección de memoria está dentro de dos regiones que se solapan, se aplicarán los permisos de la región más específica o la región con una dirección de inicio más baja.
+- Verificación por hardware: La resolución de solapamientos generalmente es manejada por hardware en la MPU. El hardware de la MPU verifica las direcciones de memoria en tiempo real y aplica los permisos adecuados según las reglas configuradas.
+- Configuración cuidadosa: Para evitar problemas de solapamiento, es importante configurar las regiones de manera cuidadosa y coherente. Los desarrolladores deben considerar las necesidades específicas de la aplicación y definir las regiones de manera que no se generen conflictos no deseados.
+- Validación y pruebas: Después de configurar las regiones, es aconsejable realizar pruebas exhaustivas para garantizar que los permisos y los solapamientos se comporten como se espera en la aplicación.
+
+![alt](/images/regiens.png)
+
 ### 21.  ¿Para qué se suele utilizar la excepción PendSV? ¿Cómo se relaciona su uso con el resto de las excepciones? Dé un ejemplo
+
+En los sistemas operativos embebidos, PendSV es una excepción que se utiliza para cambiar de tarea. Se diferencia de otras excepciones, como las de interrupción, en que puede usarse para programar la ejecución de tareas específicas en momentos oportunos.
+
+¿Cómo funciona PendSV?
+
+Cuando una tarea necesita ceder el control a otra, puede invocar PendSV. PendSV entonces suspende la tarea actual y cambia al contexto de la nueva tarea. Este proceso se denomina cambio de contexto.
+
+Un ejemplo
+
+Imaginemos un sistema operativo embebido que maneja dos tareas: una tarea que actualiza datos y otra tarea que muestra información en pantalla. Cuando la tarea de actualización de datos termina, puede invocar PendSV para ceder el control a la tarea de visualización. PendSV entonces cambia al contexto de la tarea de visualización, que luego puede mostrar la información actualizada.
+
 ### 22.  ¿Para qué se suele utilizar la excepción SVC? Expliquelo dentro de un marco de un sistema operativo embebido.
+
+La excepción SVC (Supervisor Call) se utiliza en sistemas operativos embebidos para solicitar servicios al supervisor del sistema, como el kernel del sistema operativo. Es una forma de comunicación entre las aplicaciones de usuario y el núcleo del sistema operativo. Por ejemplo, si una tarea de usuario necesita realizar una operación privilegiada, como acceder a un recurso protegido o realizar una acción que requiere privilegios especiales, puede llamar a una rutina SVC para solicitar permisos al kernel. El kernel verifica si la solicitud es válida y luego realiza la operación solicitada.
 
 ## ISA
 ### 1. ¿Qué son los sufijos y para qué se los utiliza? Dé un ejemplo
